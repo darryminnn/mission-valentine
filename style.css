@@ -1,0 +1,685 @@
+
+/* Обновляем фон всей страницы */
+body {
+    margin: 0;
+    padding: 0;
+    /* Глубокий градиент, имитирующий комнату с автоматом */
+    background: radial-gradient(circle, #3a223a 0%, #0d020d 100%);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', cursive;
+    overflow: hidden;
+}
+
+/* Корпус автомата */
+#arcade-machine {
+    position: relative;
+    padding: 60px 40px; /* Это и есть наша рамка */
+    background: #2d1b2e; /* Цвет корпуса */
+    border: 10px solid #1a0f1a; /* Внешний кант */
+    border-radius: 20px;
+    box-shadow: 
+        inset 0 0 50px rgba(0,0,0,0.8), /* Внутренняя тень */
+        0 20px 50px rgba(0,0,0,0.9); /* Тень самого автомата */
+}
+
+/* Стилизация игрового окна внутри автомата */
+#game-container {
+    position: relative;
+    width: 960px;
+    aspect-ratio: 16/9;
+    background: #000;
+    border: 8px solid #000; /* Черная рамка вокруг экрана */
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+    overflow: hidden;
+}
+
+/* Общие стили для наклеек на корпусе */
+.arcade-label {
+    position: absolute;
+    color: #ff69b4;
+    font-size: 14px;
+    text-shadow: 2px 2px 0 #000;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.player-1 {
+    top: 20px;
+    left: 40px;
+    color: #ff69b4; /* Розовый для Даши */
+}
+
+.player-2 {
+    top: 20px;
+    right: 40px;
+    color: #00ffff; /* Голубой для Егора */
+    
+}
+
+.insert-coin {
+    bottom: 20px;
+    right: 40px;
+    
+}
+
+.mission-text {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #fff;
+}
+
+/* Декоративные "болты" на корпусе */
+#arcade-machine::before,
+#arcade-machine::after {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: #4a334a;
+    border-radius: 50%;
+    box-shadow: inset -2px -2px 0 #000;
+}
+
+#arcade-machine::before { top: 20px; left: 20px; } /* Левый верхний болт */
+#arcade-machine::after { top: 20px; right: 20px; } /* Правый верхний болт */
+
+
+/* === ЭКРАН МЕНЮ === */
+#start-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2d1b2e; /* Цвет фона, пока нет картинки */
+    background-image: url('assets/menu_bg.png'); 
+    background-size: cover;
+    background-position: center;
+    image-rendering: pixelated;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Меню лежит поверх всего */
+    
+    /* Анимация перехода */
+    transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1); 
+}
+
+/* Класс, который мы добавим через JS, чтобы убрать меню */
+.slide-out {
+    transform: translateX(-100%);
+}
+
+.menu-content {
+    text-align: center;
+    color: white;
+}
+
+.title {
+    font-size: 3rem; /* Большой текст */
+    color: #ff69b4;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 50px;
+    line-height: 1.5;
+}
+
+.blinking-text {
+    font-size: 1.2rem;
+    color: #fff;
+    animation: blink 1s infinite;
+    margin-bottom: 30px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Кнопка (стилизованная под пиксель) */
+.pixel-btn {
+    font-family: 'Press Start 2P', cursive;
+    background: #ff69b4;
+    border: 4px solid #fff;
+    padding: 15px 20px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 4px 4px 0px #000;
+}
+.pixel-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
+}
+
+
+/* === ЭКРАН ИНТРО === */
+#intro-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+    z-index: 5;
+    
+    /* Скрываем его изначально через прозрачность */
+    opacity: 0;
+    pointer-events: none; /* Чтобы нельзя было кликнуть пока невидимый */
+    transition: opacity 1.5s ease-in-out; /* Плавное изменение за 1.5 сек */
+}
+
+/* Класс, который делает интро видимым */
+#intro-screen.fade-in {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Класс для затемнения в конце */
+#intro-screen.fade-out {
+    opacity: 0;
+}
+
+#intro-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Картинка впишется целиком, не обрезаясь */
+    image-rendering: pixelated; /* ВАЖНО для пиксель-арта */
+}
+
+.small-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+/* Диалоговое окно (Стиль: Glassy Retro) */
+#dialog-box {
+    position: absolute;
+    bottom: 40px; /* Чуть выше от края */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    width: 70%; /* Поуже (было 80%) */
+    max-width: 500px; /* Чтобы на компе не было гигантским */
+    
+    /* Цвет: Темно-фиолетовый, полупрозрачный */
+    background: rgba(43, 30, 50, 0.9); 
+    
+    /* Граница: Нежно-розовая (под цвет облаков) или белая */
+    border: 3px solid #ffc0cb; 
+    border-radius: 10px; /* Скруглённые углы */
+    
+    /* Тень, чтобы текст читался, а окно парило */
+    box-shadow: 0 4px 0 rgba(0,0,0,0.5); 
+    
+    padding: 15px 25px;
+    z-index: 20;
+    
+    /* Текст */
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem; /* Чуть поменьше шрифт, чтобы влезало */
+    line-height: 1.6;
+    text-align: center; /* Текст по центру выглядит аккуратнее в маленьком окне */
+    text-shadow: 2px 2px 0 #000; /* Тень у букв для читаемости */
+}
+
+/* Скрытое состояние */
+#dialog-box.hidden {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Стрелочка "Далее" */
+.continue-hint {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 0.6rem;
+    color: #ffc0cb;
+    animation: blink 1s infinite;
+}
+/* Класс для финальной анимации окна */
+.center-dialog {
+    bottom: 50% !important; /* Перемещаем на середину по вертикали */
+    transform: translate(-50%, 50%) scale(1.2) !important; /* Центрируем и чуть увеличиваем */
+    transition: all 1s ease-in-out; /* Плавный полет за 1 секунду */
+    
+    /* Можно добавить свечение, чтобы подчеркнуть важность */
+    box-shadow: 0 0 20px rgba(255, 192, 203, 0.6) !important;
+    border-color: #fff !important;
+}
+/* Класс, чтобы скрыть ТОЛЬКО картинку, оставив фон черным */
+.fade-out-image {
+    opacity: 0 !important;
+    transition: opacity 1.5s ease-in-out; /* Картинка исчезает за 1.5 сек */
+}
+
+/* (Предыдущий класс center-dialog оставляем, он двигает окно) */
+.center-dialog {
+    bottom: 50% !important;
+    transform: translate(-50%, 50%) scale(1.2) !important;
+    transition: all 1.5s ease-in-out; /* Синхронно с исчезновением картинки */
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2) !important; /* Легкое свечение в темноте */
+    border-color: #fff !important;
+}
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated; /* Чтобы пиксели были четкими */
+}
+
+/* Класс hidden у нас уже есть, но на всякий случай */
+.hidden {
+    display: none !important;
+}
+/* === КНОПКА ПАУЗЫ (В УГЛУ) === */
+#pause-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: transparent; /* Прозрачный фон, чтобы не перекрывать игру */
+    border: 3px solid #fff; /* Белая рамка */
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    text-shadow: 2px 2px #000; /* Тень текста для читаемости */
+    box-shadow: 2px 2px 0px #000; /* Тень кнопки */
+    transition: all 0.1s;
+    
+    display: flex; /* Центрируем иконку */
+    justify-content: center;
+    align-items: center;
+}
+
+#pause-btn:hover {
+    background: #ff69b4; /* Розовый фон при наведении */
+    border-color: #ff69b4;
+    color: #fff;
+    transform: scale(1.1); /* Легкое увеличение */
+}
+
+#pause-btn:active {
+    transform: translate(2px, 2px); /* Эффект нажатия */
+    box-shadow: 0px 0px 0px #000;
+}
+
+
+/* === МЕНЮ ПАУЗЫ (ОФОРМЛЕНИЕ ПОД ГЛАВНОЕ МЕНЮ) === */
+#pause-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Полупрозрачный фон, затемняющий игру */
+    background: rgba(45, 27, 46, 0.85); 
+    backdrop-filter: blur(4px); /* Размытие фона игры */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 101;
+    
+    /* Анимация появления */
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#pause-menu h2 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.5rem; /* Крупный заголовок */
+    color: #ff69b4; /* Розовый цвет */
+    text-shadow: 4px 4px #000; /* Жирная тень */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#pause-menu p {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    color: #fff;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px #000;
+    opacity: 0.8;
+}
+
+/* Кнопки в меню паузы (Стиль как на главном экране) */
+#pause-menu button {
+    font-family: 'Press Start 2P', cursive;
+    background: transparent; /* Прозрачный фон */
+    border: 4px solid #fff; /* Белая рамка */
+    padding: 15px 30px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin: 10px 0;
+    width: 250px; /* Фиксированная ширина для ровности */
+    
+    text-shadow: 2px 2px #000;
+    box-shadow: 4px 4px 0px #000; /* Пиксельная тень */
+    transition: transform 0.1s, background 0.2s;
+}
+
+#pause-menu button:hover {
+    background: #ff69b4; /* Заливка розовым при наведении */
+    border-color: #ff69b4;
+    transform: scale(1.05); /* Немного увеличиваем */
+}
+
+#pause-menu button:active {
+    transform: translate(4px, 4px); /* Эффект нажатия */
+    box-shadow: 0px 0px 0px #000;
+}
+
+/* Специальный стиль для кнопки "ЗАНОВО" (например, красный при наведении) */
+#restart-from-pause-btn:hover {
+    background: #ff4757 !important; /* Красный */
+    border-color: #ff4757 !important;
+}
+
+/* === ВЗРЫВ === */
+#explosion-effect {
+    position: absolute;
+    width: 300px; /* В 2 раза больше стандартного кота */
+    height: 300px;
+    z-index: 100;
+    pointer-events: none;
+    image-rendering: pixelated;
+    /* Центровка через transform, чтобы в JS задавать только координаты кота */
+    transform: translate(-50%, -50%); 
+}
+/* === ЭКРАН GAME OVER (РЕ-СТАЙЛИНГ ПОД ОБЩУЮ ТЕМУ) === */
+#game-over-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    /* Используем тот же глубокий фиолетовый, что и в главном меню, но темнее */
+    background: rgba(45, 27, 46, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+/* Эффект старого монитора (сделаем его менее агрессивным, розовым) */
+.crt-overlay {
+    position: absolute;
+    width: 100%; height: 100%;
+    /* Заменили красные/зеленые полосы на легкие розовые/белые */
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 105, 180, 0.05) 50%), 
+                linear-gradient(90deg, rgba(255, 105, 180, 0.03), rgba(255, 255, 255, 0.02), rgba(255, 105, 180, 0.03));
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.7;
+}
+
+.game-over-layout {
+    display: flex;
+    width: 90%;
+    max-width: 850px;
+    align-items: center;
+    gap: 40px;
+    z-index: 5;
+}
+
+/* Левая часть: Мем */
+.game-over-left {
+    flex: 1;
+}
+
+.meme-frame {
+    /* Фирменная толстая белая рамка */
+    border: 6px solid #fff;
+    padding: 5px;
+    background: #000;
+    /* Вместо свечения - жесткая пиксельная тень */
+    box-shadow: 10px 10px 0px #000;
+    transform: rotate(-3deg); /* Чуть усилил наклон */
+}
+
+#meme-img {
+    width: 100%;
+    display: block;
+    image-rendering: pixelated;
+    border: 2px solid #000; /* Тонкая рамка внутри */
+}
+
+/* Правая часть: Инфо */
+.game-over-right {
+    flex: 1.2;
+    text-align: left;
+}
+
+.glitch-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.5rem;
+    /* Главный розовый цвет */
+    color: #ff69b4;
+    margin-bottom: 25px;
+    /* Жесткая черная тень как в главном меню */
+    text-shadow: 4px 4px 0 #000;
+    letter-spacing: -1px;
+}
+
+.status-box {
+    /* Розовый фон вместо красного */
+    background: rgba(255, 105, 180, 0.2);
+    border-left: 6px solid #ff69b4;
+    padding: 15px;
+    margin-bottom: 25px;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+}
+
+.status-label {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    color: #fff;
+    margin: 0;
+    opacity: 0.8;
+}
+
+.status-value {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+    color: #fff; /* Белый текст для контраста */
+    text-shadow: 2px 2px 0 #000;
+    margin: 8px 0 0 0;
+}
+
+.flavor-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7rem;
+    color: #ffc0cb; /* Светло-розовый */
+    line-height: 1.6;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* Кнопка рестарта - приводим к общему стилю */
+.reboot-btn {
+    width: 100%;
+    /* Используем те же стили, что у .pixel-btn */
+    background: #ff69b4;
+    border: 4px solid #fff;
+    color: white;
+    font-size: 1rem;
+    padding: 20px;
+    box-shadow: 6px 6px 0px #000; /* Тень чуть больше */
+    transition: all 0.1s;
+}
+
+.reboot-btn:hover {
+    background: #ff85c1; /* Чуть светлее при наведении */
+    transform: scale(1.02);
+    box-shadow: 8px 8px 0px #000;
+}
+
+.reboot-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 2px 2px 0px #000;
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+}
+
+/* Класс для плавного исчезновения игры */
+.fade-out-game {
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+/* === ФИНАЛ === */
+#finale-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000; /* Фон по умолчанию черный */
+    z-index: 1000;
+    overflow: hidden;
+    
+    /* Для плавного появления самого экрана финала */
+    opacity: 0;
+    transition: opacity 1s ease-in-out, background-color 0.5s ease;
+    display: flex; /* Нужно чтобы flex работал с hidden/visible */
+}
+
+/* Класс, который делает финал видимым */
+#finale-screen.visible {
+    opacity: 1 !important;
+}
+
+#finale-img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* Класс для анимации выплывания снизу (для 4-го кадра) */
+.slide-up {
+    animation: slideUpAnim 1.2s ease-out forwards;
+}
+
+@keyframes slideUpAnim {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* === ЭФФЕКТ СЕРДЕЧЕК === */
+#flower-effects {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1500;
+}
+
+.pixel-heart {
+    position: absolute;
+    width: 6px; 
+    height: 6px;
+    background: #ff5c6c;
+    /* Рисуем форму сердца тенями (смещение X, смещение Y, цвет) */
+    box-shadow: 
+        -6px -6px #ff5c6c, 6px -6px #ff5c6c, /* Ушки */
+        -6px 0px #ff5c6c, 6px 0px #ff5c6c,  /* Бока */
+        0px 6px #ff5c6c,                     /* Низ */
+        -12px -6px rgba(0,0,0,0), 12px -6px rgba(0,0,0,0); /* Для симметрии контейнера */
+    opacity: 0;
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% { 
+        opacity: 0; 
+        transform: scale(0.5) translateY(0); 
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.2) translateY(-20px); /* Легкое движение вверх при мерцании */
+    }
+}
+/* === КНОПКА РЕСТАРТА (ИКОНКА В УГЛУ) === */
+#restart-icon-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    
+    /* Делаем квадратной и чуть побольше */
+    width: 60px;
+    height: 60px;
+    
+    /* Пиксельный стиль: Розовый фон, Белая рамка, Без скруглений */
+    background: #ff69b4;
+    border: 4px solid #fff;
+    border-radius: 0; 
+    color: #fff;
+    
+    /* Шрифт */
+    font-family: 'Press Start 2P', cursive;
+    font-size: 24px;
+    line-height: 1; /* Чтобы символ был по центру */
+    
+    /* Жесткая пиксельная тень */
+    box-shadow: 6px 6px 0px #000;
+    
+    cursor: pointer;
+    z-index: 2000;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Анимация появления */
+    animation: fadeInBtn 1s ease-in 0.5s forwards; 
+    opacity: 0; 
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+#restart-icon-btn:hover {
+    background: #ff1493; /* Чуть темнее при наведении */
+    transform: translate(2px, 2px); /* Эффект нажатия (сдвиг вниз) */
+    box-shadow: 4px 4px 0px #000; /* Тень уменьшается */
+}
+
+#restart-icon-btn:active {
+    transform: translate(6px, 6px); /* Полное нажатие */
+    box-shadow: 0px 0px 0px #000; /* Тень исчезает */
+}
+
+@keyframes fadeInBtn {
+    to { opacity: 1; }
+}

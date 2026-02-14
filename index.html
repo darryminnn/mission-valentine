@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mission: Valentine</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/icon_cat.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="arcade-machine">
+    <div class="arcade-label player-1">P1: DASHA</div>
+    <div class="arcade-label player-2">P2: EGOR</div>
+    <div class="arcade-label insert-coin">INSERT COIN</div>
+    <div class="arcade-label mission-text">MISSION: VALENTINE</div>
+    <div id="game-container">
+        
+        <div id="start-screen">
+            <div class="menu-content">
+                <h1 class="title">MISSION:<br>VALENTINE</h1>
+                <div class="blinking-text">PRESS [ENTER] TO START</div>
+                <button id="start-btn" class="pixel-btn">START GAME</button>
+            </div>
+        </div>
+
+        <div id="intro-screen">
+            <div class="intro-container">
+                <img id="intro-img" src="" alt="Intro Scene">
+                <div id="dialog-box" class="hidden">
+                    <p id="dialog-text"></p>
+                    <div class="continue-hint">>></div>
+                </div>
+                <button id="skip-btn" class="pixel-btn small-btn">SKIP >></button>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="960" height="540" class="hidden"></canvas>
+        
+        <button id="pause-btn" class="hidden">II</button>
+        
+        <div id="pause-menu" class="hidden">
+           <h2>PAUSE</h2>
+           <p>ฅᨐฅ Котик чиллит ฅᨐฅ</p>
+           <button id="resume-btn">CONTINUE</button>
+           <button id="restart-from-pause-btn">RESTART</button>
+        </div>
+
+        <img id="explosion-effect" src="assets/explosion.png" class="hidden" alt="BOOM">
+
+        <div id="finale-screen" class="hidden">
+            <img id="finale-img" src="" alt="Finale Scene">
+            <div id="flower-effects"></div>
+            <button id="restart-icon-btn" class="hidden">↻</button>
+        </div>
+
+        <div id="game-over-screen" class="hidden">
+            <div class="crt-overlay"></div>
+            <div class="game-over-layout">
+                <div class="game-over-left">
+                    <div class="meme-frame">
+                        <img id="meme-img" src="assets/meme_gameover.png" alt="Meme">
+                    </div>
+                </div>
+                <div class="game-over-right">
+                    <h2 class="glitch-title">GAME OVER</h2>
+                    <div class="status-box">
+                        <p class="status-label">STATUS:</p>
+                        <p class="status-value">KITTY CRASHED</p>
+                    </div>
+                    <p class="flavor-text">Котик врезался на полной скорости. Требуется время на зализывание ран и восстановление мурчальника...</p>
+                    <button id="full-restart-btn" class="pixel-btn reboot-btn">HEAL & RESTART</button>
+                </div>
+            </div>
+        </div>
+    <div class="scanlines"></div>
+    </div>
+</div>
+    <div id="audio-container">
+        <audio id="bgm-menu" src="assets/music_menu.mp3" loop></audio>
+        <audio id="bgm-game" src="assets/music_game.mp3" loop></audio>
+        <audio id="bgm-gameover" src="assets/music_gameover.mp3" loop></audio>
+        <audio id="bgm-finale" src="assets/music_finale.mp3"></audio> <audio id="sfx-jump" src="assets/sfx_jump.mp3"></audio>
+        <audio id="sfx-hit" src="assets/sfx_hit.mp3"></audio>
+    </div>
+    <div id="transition-overlay"></div>
+    <script src="script.js"></script>
+</body>
+</html>
