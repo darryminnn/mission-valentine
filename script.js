@@ -279,11 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function playCutsceneSlides() {
         // Добавили поле 'text' для диалогов
         const slides = [
-            { id: 0, delay: 0 }, 
-            { id: 1, delay: 3000, text: "А? Это мне?" }, // Парень садится
-            { id: 2, delay: 6000, text: "Спасибо." },    // Парень берет письмо
-            { id: 3, delay: 9000 },                      // Руки
-            { id: 4, delay: 12500 }                      // Финал
+            { id: 0, delay: 0, text: "А? Это мне?" }, 
+            { id: 1, delay: 3000, text: "Спасибо." }, 
+            { id: 2, delay: 6000 },    
+            { id: 3, delay: 9000 },                      
+            { id: 4, delay: 12500 }                    
         ];
 
         slides.forEach(slide => {
@@ -503,4 +503,5 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     canvas.addEventListener('mousedown', jumpAction);
     canvas.addEventListener('touchstart', jumpAction);
+
 });
